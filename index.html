@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0716">
+<title>PRDR CONVERTER</title>
+<link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><link rel="manifest" href="manifest.webmanifest"><meta name="description" content="PRDR CONVERTER: convert Red Dead Redemption 2 photo mode files to PNG, JPG or WebP in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0716;--gold:#e9b44c;--pur:#8b5cf6;--t:#f4f1ff;--m:#a9a3c4;--c:rgba(255,255,255,.06);--bd:rgba(255,255,255,.13)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--t);font:400 16px/1.5 Inter,system-ui,sans-serif;min-height:100vh;overflow-x:hidden;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.aur{position:fixed;inset:0;z-index:-2;overflow:hidden;background:linear-gradient(180deg,#04040a,#171029 50%,#37194f)}
+.aur i{position:absolute;width:65vmax;height:65vmax;border-radius:50%;filter:blur(90px);animation:fl 24s ease-in-out infinite alternate}
+.aur i:nth-child(1){background:#7c3aed;left:-25%;top:35%;opacity:.45}
+.aur i:nth-child(2){background:#e9b44c;right:-30%;top:55%;opacity:.25;animation-delay:-9s}
+.aur i:nth-child(3){background:#2563eb;left:15%;top:-35%;opacity:.35;animation-delay:-15s}
+@keyframes fl{to{transform:translate(14vw,-9vh) scale(1.25) rotate(45deg)}}
+#dust{position:fixed;inset:0;z-index:-1;pointer-events:none}
+main{max-width:980px;margin:0 auto;padding:28px 16px 60px}
+header{text-align:center;padding:18px 0 26px;animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(26px)}}
+h1{font:900 clamp(2rem,7vw,3.6rem)/1.08 Cinzel,Georgia,serif;letter-spacing:.02em;background:linear-gradient(100deg,#fff 20%,var(--gold) 45%,#fff 70%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 6s linear infinite}
+@keyframes sheen{to{background-position:-250% 0}}
+header p{color:var(--m);margin-top:10px}
+.logo{width:112px;height:112px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);display:block;margin:0 auto 14px;box-shadow:0 0 0 6px #e9b44c22,0 0 50px #e9b44c66;animation:glow 4s ease-in-out infinite alternate}.logo.big{width:150px}@keyframes glow{to{box-shadow:0 0 0 12px #e9b44c14,0 0 80px #e9b44caa}}
+.stats{display:flex;justify-content:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.stats span{border:1px solid var(--bd);background:var(--c);border-radius:99px;padding:4px 14px;font-size:.85rem;color:var(--m)}
+.stats b{color:var(--gold)}
+nav{display:flex;gap:6px;max-width:560px;background:var(--c);border:1px solid var(--bd);border-radius:16px;padding:5px;margin:0 auto 22px;backdrop-filter:blur(12px)}
+nav button{flex:1;border:0;background:none;color:var(--m);font:600 .95rem Inter,sans-serif;padding:10px 6px;border-radius:12px;cursor:pointer;transition:.3s}
+nav button.on{background:linear-gradient(135deg,var(--pur),#c084fc);color:#fff;box-shadow:0 6px 22px #8b5cf666}
+section.tab{display:none}section.tab.on{display:block;animation:rise .5s both}
+.glass{background:var(--c);border:1px solid var(--bd);border-radius:22px;padding:22px;backdrop-filter:blur(14px);margin-bottom:18px}
+#drop{border:2px dashed #8b8fb8aa;border-radius:24px;text-align:center;padding:38px 18px;cursor:pointer;transition:.3s;background:rgba(10,8,25,.45);position:relative;overflow:hidden}
+#drop:hover,#drop.ov{border-color:var(--gold);background:rgba(233,180,76,.08);transform:scale(1.012)}
+#drop svg{width:64px;height:64px;color:#9aa3c7;animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-9px)}}
+#drop h2{font:800 1.5rem Cinzel,serif;margin:10px 0 2px}
+#drop p{color:var(--m)}
+.tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.tags span{border:1px solid #4a5a9a;color:#8fb0ff;border-radius:10px;padding:4px 12px;font:.82rem ui-monospace,Consolas,monospace}
+.set{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;align-items:end}
+label{font-size:.82rem;color:var(--m);display:block}
+select,input[type=text]{width:100%;margin-top:4px;background:#120c24;color:var(--t);border:1px solid var(--bd);border-radius:10px;padding:9px;font:inherit}
+input[type=range]{width:100%;accent-color:var(--gold);margin-top:6px}
+button.pr,.btn{background:linear-gradient(135deg,var(--gold),#f59e0b);color:#2a1800;border:0;border-radius:11px;padding:9px 14px;font:700 .9rem Inter,sans-serif;cursor:pointer;transition:.25s}
+button.pr:hover,.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px #e9b44c55}
+button.gh{background:var(--c);color:var(--t);border:1px solid var(--bd);border-radius:11px;padding:9px 14px;font:600 .9rem Inter,sans-serif;cursor:pointer;transition:.25s}
+button.gh:hover{background:rgba(255,255,255,.14)}
+button:focus-visible,#drop:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 16px}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.card{background:var(--c);border:1px solid var(--bd);border-radius:18px;overflow:hidden;animation:pop .5s cubic-bezier(.2,1.2,.3,1) both;transition:.3s}
+.card:hover{transform:translateY(-4px);border-color:var(--gold)}
+@keyframes pop{from{opacity:0;transform:scale(.88)}}
+.th{aspect-ratio:16/9;background:#0006;position:relative}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.sp{position:absolute;inset:0;display:grid;place-items:center;background:#0009}
+.sp::after{content:"";width:34px;height:34px;border:3px solid #fff3;border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.card.ok .sp{display:none}
+.card.er .sp::after{display:none}.card.er .sp{color:#ff8a8a;padding:12px;text-align:center;font-size:.85rem}
+.in{padding:12px}.in b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.92rem}
+.in small{color:var(--m)}.bt{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}.bt button{padding:7px 11px;font-size:.82rem}
+.stu{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
+@media(max-width:760px){.stu{grid-template-columns:1fr}}
+#pv{width:100%;border-radius:14px;background:#0008;display:block}
+.sl{margin-bottom:10px}.sl label{display:flex;justify-content:space-between}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chips button{padding:7px 12px;font-size:.85rem}
+.empty{text-align:center;color:var(--m);padding:26px}
+code,pre{font:.82rem ui-monospace,Consolas,monospace}
+pre{background:#0008;border-radius:12px;padding:12px;overflow-x:auto;color:#c9d4ff;white-space:pre}
+.path{display:flex;gap:8px;align-items:center}.path pre{flex:1;margin:0}
+ol{padding-left:20px;color:var(--m)}li{margin:6px 0}li b,.glass h3{color:var(--t)}
+.glass h3{margin-bottom:8px;font:700 1.2rem Cinzel,serif}
+dialog{background:#150e26;color:var(--t);border:1px solid var(--bd);border-radius:20px;width:min(680px,94vw);padding:20px;margin:auto;max-height:88vh;overflow:auto}
+dialog::backdrop{background:#000a;backdrop-filter:blur(5px)}
+dialog[open]{animation:pop .35s both}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}td{padding:5px 8px;border-bottom:1px solid var(--bd);word-break:break-all}td:first-child{color:var(--gold);white-space:nowrap}
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,90px);background:#1d1336;border:1px solid var(--gold);padding:10px 18px;border-radius:99px;transition:.4s;z-index:9;max-width:92vw}
+#toast.on{transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="aur"><i></i><i></i><i></i></div><canvas id="dust"></canvas>
+<main>
+<header>
+<img class="logo" src="logo.jpg" alt="PRDR CONVERTER logo"><h1>PRDR CONVERTER</h1>
+<p>Convert Red Dead Redemption 2 photo mode files to high-quality PNG, JPG or WebP. Everything runs in your browser.</p>
+<div class="stats"><span><b id="sN">0</b> converted</span><span><b id="sS">0 KB</b> output</span><span>No uploads</span></div>
+</header>
+<nav id="nav"><button class="on" data-t="conv">Converter</button><button data-t="stu">Studio</button><button data-t="gd">Guide</button><button data-t="ab">About</button></nav>
+
+<section class="tab on" id="conv">
+<div id="drop" tabindex="0" role="button" aria-label="Choose PRDR files">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 0L7 8m5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+<h2>Drop PRDR files here</h2><p>or tap to browse</p>
+<div class="tags"><span>Supports multiple files</span><span>PRDR + PNG/JPG/WebP</span></div>
+</div>
+<input type="file" id="fi" multiple hidden>
+<div class="glass" style="margin-top:18px"><div class="set">
+<div><label>Output format<select id="fmt"><option value="image/png">PNG (lossless)</option><option value="image/jpeg">JPG</option><option value="image/webp">WebP</option></select></label></div>
+<div id="qw" style="display:none"><label>Quality <b id="qv">92</b>%<input type="range" id="q" min="40" max="100" value="92"></label></div>
+<div><label>Scale<select id="scale"><option value="1">Original size</option><option value="1.5">1.5x</option><option value="2">2x upscale</option></select></label></div>
+</div></div>
+<div class="bar" id="bar" style="display:none"><button class="pr" id="zipB">Download all (ZIP)</button><button class="gh" id="clr">Clear</button></div>
+<div id="grid"></div>
+</section>
+
+<section class="tab" id="stu">
+<div class="glass" id="stE"><div class="empty">No image loaded. Convert a PRDR file and press Edit, or open any image.<br><br><button class="pr" id="stO">Open image</button></div></div>
+<div class="stu" id="stW" style="display:none">
+<div class="glass"><canvas id="pv"></canvas></div>
+<div class="glass">
+<div class="chips" id="pre"></div>
+<div id="sls"></div>
+<div class="chips"><button class="gh" id="rot">Rotate 90°</button><button class="gh" id="flp">Flip</button><button class="gh" id="rst">Reset</button></div>
+<div class="bar"><button class="pr" id="stD">Download edit</button><button class="gh" id="stO2">Open another</button></div>
+</div></div>
+<input type="file" id="sfi" accept="image/*" hidden>
+</section>
+
+<section class="tab" id="gd">
+<div class="glass"><h3>Where to find PRDR files</h3>
+<div class="path"><pre id="pth">Documents\Rockstar Games\Red Dead Redemption 2\Profiles\&lt;your-id&gt;\</pre><button class="gh" id="cp">Copy</button></div>
+<p style="color:var(--m);margin-top:10px">Photo files start with “PRDR” and have no file extension. On Android, pick “All files” in the file chooser if they look greyed out.</p></div>
+<div class="glass"><h3>Deploy with GitHub Actions</h3>
+<ol><li>Create a repository and upload every file from the project, keeping the folder layout.</li><li>Make sure <b>.github/workflows/deploy.yml</b> is included.</li><li>Open <b>Settings → Pages</b> and set Source to <b>GitHub Actions</b>.</li><li>Push to <b>main</b>. Your site goes live in about a minute.</li></ol></div>
+<div class="glass"><h3>Tips</h3><ol><li>The Info button on each result shows the photo’s hidden metadata and the file header.</li><li>Studio applies a Western, Dusk or Noir look and exports at full resolution.</li><li>Changing format, quality or scale re-converts every file instantly.</li></ol></div>
+</section>
+<section class="tab" id="ab">
+<div class="glass" style="text-align:center"><img class="logo big" src="logo.jpg" alt=""><h3 style="font-size:1.6rem">PRDR CONVERTER</h3><p style="color:var(--m)">A free converter for Red Dead Redemption 2 photo mode files.</p></div>
+<div class="glass"><h3>About the app</h3><ol><li>Converts PRDR photos to PNG, JPG or WebP at original size or upscaled.</li><li>Private by design: files never leave your device.</li><li>Works offline once installed. Use “Add to Home screen” in your browser menu.</li><li>Studio adds Western, Dusk and Noir looks with full-resolution export.</li></ol></div>
+<div class="glass" id="abM"><h3 id="abH">About me</h3><p id="abB" style="color:var(--m)"></p><div class="bar" id="abL" style="margin-top:14px"></div></div>
+</section>
+</main>
+<dialog id="dlg"></dialog><div id="toast"></div>
+
+<script>
+/* EDIT ME: your About details */
+const ABOUT={name:"",bio:"Hi! I built PRDR CONVERTER for fellow Red Dead Redemption 2 photographers who want their photo mode shots as normal images. Open index.html and edit the ABOUT block at the top of the script to add your own name, story and links here.",links:[/* {t:"GitHub",u:"https://github.com/yourname"} */]};
+const $=s=>document.querySelector(s),EXT={'image/png':'png','image/jpeg':'jpg','image/webp':'webp'};
+let R=[],ID=0,tt;
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600)};
+const fmtB=n=>n>1048576?(n/1048576).toFixed(2)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+function dl(b,n){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
+/* dust */
+const cv=$('#dust'),cx=cv.getContext('2d');let W,H,P=[];
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;P=Array.from({length:Math.min(70,W/14|0)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.8+.4,v:Math.random()*.3+.1,a:Math.random()*6}))}
+rs();addEventListener('resize',rs);
+(function L(){cx.clearRect(0,0,W,H);for(const p of P){p.a+=.02;p.y-=p.v;p.x+=Math.sin(p.a)*.4;if(p.y<-5){p.y=H+5;p.x=Math.random()*W}cx.beginPath();cx.fillStyle=`rgba(233,180,76,${.25+.25*Math.sin(p.a*2)})`;cx.arc(p.x,p.y,p.r,0,7);cx.fill()}requestAnimationFrame(L)})();
+/* tabs */
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
+function go(t){document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));document.querySelectorAll('section.tab').forEach(s=>s.classList.toggle('on',s.id==t))}
+/* PRDR parsing */
+function jpegs(u){const out=[];let from=0;
+ while(from<u.length-3){let s=-1;for(let i=from;i<u.length-3;i++)if(u[i]==255&&u[i+1]==216&&u[i+2]==255){s=i;break}
+  if(s<0)break;let p=s+2,e=u.length;
+  while(p<u.length-1){if(u[p]!=255){p++;continue}const m=u[p+1];
+   if(m==255){p++;continue}
+   if(m==217){e=p+2;break}
+   if(m==0||m==1||(m>=208&&m<=215)){p+=2;continue}
+   if(m==218){p+=2+((u[p+2]<<8)|u[p+3]);while(p<u.length-1){if(u[p]==255){const n=u[p+1];if(n!=0&&!(n>=208&&n<=215))break;p+=2}else p++}continue}
+   p+=2+((u[p+2]<<8)|u[p+3])}
+  out.push([s,e]);from=Math.max(e,s+3)}
+ return out.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))}
+function getMeta(u,s,e){const td=new TextDecoder(),t=td.decode(u.subarray(0,s))+'\n'+td.decode(u.subarray(e));
+ let i=-1,n=0;
+ while((i=t.indexOf('{',i+1))>=0&&n++<200){let d=0,q=false,es=false;
+  for(let j=i;j<t.length;j++){const c=t[j];
+   if(q){if(es)es=false;else if(c=='\\')es=true;else if(c=='"')q=false}
+   else if(c=='"')q=true;else if(c=='{')d++;
+   else if(c=='}'&&--d==0){try{const o=JSON.parse(t.slice(i,j+1));if(Object.keys(o).length)return o}catch(x){}break}}}
+ return null}
+async function decode(f){
+ const u=new Uint8Array(await f.arrayBuffer());
+ const isP=u[0]==80&&u[1]==82&&u[2]==68&&u[3]==82;
+ const reg=(u[0]==255&&u[1]==216)||(u[0]==137&&u[1]==80)||(u[0]==82&&u[1]==73)||(u[0]==71&&u[1]==73);
+ if(!isP&&reg)return{bmp:await createImageBitmap(f),meta:null,head:u.subarray(0,160),kind:'Image',off:0,len:u.length};
+ const c=jpegs(u);if(!c.length)throw Error('Not a PRDR photo: no image data found.');
+ for(const [s,e] of c){try{const bmp=await createImageBitmap(new Blob([u.subarray(s,e)],{type:'image/jpeg'}));
+  return{bmp,meta:getMeta(u,s,e),head:u.subarray(0,160),kind:isP?'PRDR':'Unknown (header not PRDR)',off:s,len:e-s}}catch(x){}}
+ throw Error('Image data found but could not be decoded.')}
+/* encode */
+function render(bmp){const sc=+$('#scale').value,c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
+ const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(bmp,0,0,c.width,c.height);return c}
+const toB=c=>new Promise(r=>{const f=$('#fmt').value,q=$('#q').value/100;if(f=='image/jpeg'){const t=document.createElement('canvas');t.width=c.width;t.height=c.height;const x=t.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,t.width,t.height);x.drawImage(c,0,0);c=t}c.toBlob(b=>r(b),f,q)});
+async function enc(r){const c=render(r.bmp),b=await toB(c);if(r.url)URL.revokeObjectURL(r.url);r.blob=b;r.url=URL.createObjectURL(b);r.w=c.width;r.h=c.height;r.ext=EXT[b.type]||'png'}
+function paint(r){const d=r.el;d.className='card '+(r.err?'er':r.blob?'ok':'');
+ d.querySelector('b').textContent=r.err?r.name:r.base+'.'+r.ext;
+ d.querySelector('small').textContent=r.err?'Failed':`${r.w}×${r.h} · ${fmtB(r.blob.size)} · ${r.info.kind}`;
+ if(r.err)d.querySelector('.sp').textContent=r.err;else d.querySelector('img').src=r.url;
+ d.querySelectorAll('.bt button').forEach(b=>{if(r.err&&b.dataset.a!='rm')b.style.display='none'});stats()}
+function stats(){const o=R.filter(r=>r.blob);$('#sN').textContent=o.length;$('#sS').textContent=fmtB(o.reduce((a,r)=>a+r.blob.size,0));$('#bar').style.display=R.length?'flex':'none'}
+async function handle(files){
+ for(const f of files){const r={id:++ID,name:f.name,base:f.name.replace(/\.[^.]*$/,'')||'photo'};R.push(r);
+  const d=document.createElement('div');d.className='card';d.dataset.id=r.id;
+  d.innerHTML='<div class="th"><img alt=""><div class="sp"></div></div><div class="in"><b></b><small>Converting…</small><div class="bt"><button class="pr" data-a="dl">Download</button><button class="gh" data-a="ed">Edit</button><button class="gh" data-a="info">Info</button><button class="gh" data-a="rm">✕</button></div></div>';
+  d.querySelector('b').textContent=f.name;r.el=d;$('#grid').prepend(d);$('#bar').style.display='flex';
+  try{r.info=await decode(f);r.bmp=r.info.bmp;await enc(r)}catch(e){r.err=e.message||'Conversion failed'}
+  paint(r)}
+}
+$('#grid').onclick=async e=>{const b=e.target.closest('button');if(!b)return;const r=R.find(x=>x.id==b.closest('.card').dataset.id);if(!r)return;
+ if(b.dataset.a=='dl')dl(r.blob,r.base+'.'+r.ext);
+ if(b.dataset.a=='rm'){R=R.filter(x=>x!=r);r.el.remove();stats()}
+ if(b.dataset.a=='ed'){loadStudio(r.bmp,r.base);go('stu')}
+ if(b.dataset.a=='info')info(r)};
+/* drop zone */
+const dz=$('#drop'),fi=$('#fi');
+dz.onclick=()=>fi.click();dz.onkeydown=e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();fi.click()}};
+fi.onchange=()=>{handle([...fi.files]);fi.value=''};
+['dragenter','dragover'].forEach(v=>addEventListener(v,e=>{e.preventDefault();dz.classList.add('ov')}));
+['dragleave','drop'].forEach(v=>addEventListener(v,e=>{e.preventDefault();if(v=='drop'||!e.relatedTarget)dz.classList.remove('ov')}));
+addEventListener('drop',e=>{if(e.dataTransfer.files.length){go('conv');handle([...e.dataTransfer.files])}});
+/* settings */
+let deb;const redo=()=>{clearTimeout(deb);deb=setTimeout(async()=>{for(const r of R)if(r.bmp){await enc(r);paint(r)}},250)};
+$('#fmt').onchange=()=>{$('#qw').style.display=$('#fmt').value=='image/png'?'none':'block';redo()};
+$('#q').oninput=()=>{$('#qv').textContent=$('#q').value;redo()};$('#scale').onchange=redo;
+$('#clr').onclick=()=>{R.forEach(r=>r.url&&URL.revokeObjectURL(r.url));R=[];$('#grid').innerHTML='';stats()};
+/* zip */
+const crcT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc=u=>{let c=-1;for(let i=0;i<u.length;i++)c=crcT[(c^u[i])&255]^(c>>>8);return(c^-1)>>>0};
+function zip(fs){const parts=[],cd=[],en=new TextEncoder();let off=0,cs=0;
+ for(const f of fs){const nm=en.encode(f.name),c=crc(f.data),sz=f.data.length;
+  const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x800,true);h.setUint32(14,c,true);h.setUint32(18,sz,true);h.setUint32(22,sz,true);h.setUint16(26,nm.length,true);
+  parts.push(h.buffer,nm,f.data);
+  const d=new DataView(new ArrayBuffer(46));d.setUint32(0,0x02014b50,true);d.setUint16(4,20,true);d.setUint16(6,20,true);d.setUint16(8,0x800,true);d.setUint32(16,c,true);d.setUint32(20,sz,true);d.setUint32(24,sz,true);d.setUint16(28,nm.length,true);d.setUint32(42,off,true);
+  cd.push(d.buffer,nm);off+=30+nm.length+sz;cs+=46+nm.length}
+ const e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,fs.length,true);e.setUint16(10,fs.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+ return new Blob([...parts,...cd,e.buffer],{type:'application/zip'})}
+$('#zipB').onclick=async()=>{const ok=R.filter(r=>r.blob);if(!ok.length)return toast('Nothing to download yet');
+ const used={},fs=[];for(const r of ok){let n=r.base+'.'+r.ext;if(used[n]){n=r.base+'_'+used[n]+'.'+r.ext}used[r.base+'.'+r.ext]=(used[r.base+'.'+r.ext]||0)+1;fs.push({name:n,data:new Uint8Array(await r.blob.arrayBuffer())})}
+ dl(zip(fs),'rdr2-photos.zip');toast('ZIP ready')};
+/* info dialog */
+const flat=(o,p='')=>Object.entries(o).flatMap(([k,v])=>v&&typeof v=='object'?flat(v,p+k+'.'):[[p+k,v]]);
+function info(r){const i=r.info,h=i.head;let hex='';
+ for(let o=0;o<h.length;o+=16){const row=[...h.subarray(o,o+16)];hex+=o.toString(16).padStart(4,'0')+'  '+row.map(b=>b.toString(16).padStart(2,'0')).join(' ').padEnd(48)+' '+row.map(b=>b>31&&b<127?String.fromCharCode(b):'.').join('')+'\n'}
+ const rows=i.meta?flat(i.meta):[];const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+ const d=$('#dlg');d.innerHTML=`<h3 style="font:700 1.3rem Cinzel,serif">${esc(r.name)}</h3>
+ <table><tr><td>Type</td><td>${esc(i.kind)}</td></tr><tr><td>Image offset</td><td>${i.off} bytes</td></tr><tr><td>Image data</td><td>${fmtB(i.len)}</td></tr><tr><td>Resolution</td><td>${r.bmp.width}×${r.bmp.height}</td></tr></table>
+ <b>Photo metadata</b>${rows.length?'<table>'+rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')+'</table>':'<p style="color:var(--m);margin:8px 0">No readable metadata in this file.</p>'}
+ <b>File header</b><pre>${esc(hex)}</pre>
+ <div class="bar">${i.meta?'<button class="gh" id="jc">Copy JSON</button><button class="gh" id="jd">Download JSON</button>':''}<button class="pr" id="jx">Close</button></div>`;
+ d.showModal();$('#jx').onclick=()=>d.close();
+ if(i.meta){$('#jc').onclick=()=>navigator.clipboard.writeText(JSON.stringify(i.meta,null,2)).then(()=>toast('Copied'),()=>toast('Copy failed'));
+  $('#jd').onclick=()=>dl(new Blob([JSON.stringify(i.meta,null,2)],{type:'application/json'}),r.base+'.json')}}
+$('#dlg').onclick=e=>{if(e.target==e.currentTarget)e.target.close()};
+$('#cp').onclick=()=>navigator.clipboard.writeText('Documents\\Rockstar Games\\Red Dead Redemption 2\\Profiles\\').then(()=>toast('Path copied'),()=>toast('Copy failed'));
+/* studio */
+const SL=[['br','Brightness',50,150,100],['ct','Contrast',50,150,100],['sat','Saturation',0,200,100],['sep','Sepia',0,100,0],['warm','Warmth',-40,40,0],['vig','Vignette',0,100,0],['grain','Grain',0,60,0]];
+const PR={Original:{},Western:{sep:60,warm:12,vig:40,sat:90,grain:12,ct:110},Dusk:{warm:22,sat:125,br:94,vig:35,ct:108},Noir:{sat:0,ct:125,vig:55,grain:25,br:96},Vivid:{sat:150,ct:112,vig:15}};
+let S={src:null,name:'',rot:0,flip:false},V={},raf;
+SL.forEach(([k,n,a,b,d])=>{$('#sls').insertAdjacentHTML('beforeend',`<div class="sl"><label>${n}<b id="v_${k}">${d}</b></label><input type="range" id="s_${k}" min="${a}" max="${b}" value="${d}"></div>`);$('#s_'+k).oninput=e=>{$('#v_'+k).textContent=e.target.value;sched()}});
+Object.keys(PR).forEach(n=>{const b=document.createElement('button');b.className='gh';b.textContent=n;b.onclick=()=>setP(PR[n]);$('#pre').append(b)});
+function setP(o){SL.forEach(([k,,,,d])=>{const v=o[k]??d;$('#s_'+k).value=v;$('#v_'+k).textContent=v});sched()}
+const sched=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(draw)};
+function loadStudio(bmp,name){S={src:bmp,name,rot:0,flip:false};$('#stE').style.display='none';$('#stW').style.display='grid';setP({})}
+function base(max){const s=S.src,sc=Math.min(1,max/Math.max(s.width,s.height)),sw=Math.round(s.width*sc),sh=Math.round(s.height*sc),o=S.rot%2,c=document.createElement('canvas');
+ c.width=o?sh:sw;c.height=o?sw:sh;const x=c.getContext('2d');x.imageSmoothingQuality='high';x.translate(c.width/2,c.height/2);x.rotate(S.rot*Math.PI/2);if(S.flip)x.scale(-1,1);x.drawImage(s,-sw/2,-sh/2,sw,sh);return c}
+function fx(c){const w=c.width,h=c.height,x=c.getContext('2d'),d=x.getImageData(0,0,w,h),a=d.data,g=k=>+$('#s_'+k).value;
+ const b=g('br')/100,ct=g('ct')/100,s=g('sat')/100,sp=g('sep')/100,wm=g('warm'),vg=g('vig')/100,gr=g('grain'),cx=w/2,cy=h/2,md=Math.hypot(cx,cy);
+ for(let y=0,i=0;y<h;y++)for(let X=0;X<w;X++,i+=4){let r=a[i]*b,gg=a[i+1]*b,bl=a[i+2]*b;
+  r=(r-128)*ct+128;gg=(gg-128)*ct+128;bl=(bl-128)*ct+128;
+  const l=.299*r+.587*gg+.114*bl;r=l+(r-l)*s;gg=l+(gg-l)*s;bl=l+(bl-l)*s;
+  if(sp){const tr=.393*r+.769*gg+.189*bl,tg=.349*r+.686*gg+.168*bl,tb=.272*r+.534*gg+.131*bl;r+=(tr-r)*sp;gg+=(tg-gg)*sp;bl+=(tb-bl)*sp}
+  r+=wm;bl-=wm;
+  if(vg){const k=1-vg*Math.pow(Math.hypot(X-cx,y-cy)/md,2.2);r*=k;gg*=k;bl*=k}
+  if(gr){const n=(Math.random()-.5)*gr;r+=n;gg+=n;bl+=n}
+  a[i]=r;a[i+1]=gg;a[i+2]=bl}
+ x.putImageData(d,0,0)}
+function draw(){if(!S.src)return;const c=base(1000);fx(c);const p=$('#pv');p.width=c.width;p.height=c.height;p.getContext('2d').drawImage(c,0,0)}
+$('#rot').onclick=()=>{S.rot=(S.rot+1)%4;sched()};$('#flp').onclick=()=>{S.flip=!S.flip;sched()};$('#rst').onclick=()=>{S.rot=0;S.flip=false;setP({})};
+$('#stD').onclick=async()=>{if(!S.src)return;toast('Rendering full size…');await new Promise(r=>setTimeout(r,30));const c=base(1e9);fx(c);const b=await toB(c);dl(b,S.name+'-edit.'+(EXT[b.type]||'png'));toast('Saved')};
+const sf=$('#sfi');$('#stO').onclick=$('#stO2').onclick=()=>sf.click();
+sf.onchange=async()=>{const f=sf.files[0];sf.value='';if(!f)return;try{loadStudio(await createImageBitmap(f),f.name.replace(/\.[^.]*$/,''))}catch(e){toast('Could not open that image')}};
+/* about + offline */
+if(ABOUT.name)$('#abH').textContent='About '+ABOUT.name;
+$('#abB').textContent=ABOUT.bio;
+ABOUT.links.forEach(l=>{const a=document.createElement('a');a.className='btn';a.style.textDecoration='none';a.textContent=l.t;a.href=l.u;a.target='_blank';a.rel='noopener';$('#abL').append(a)});
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
